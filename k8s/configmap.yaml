@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: url-monitor-config
+  labels:
+    app: url-monitor
+data:
+  PORT: "3000"
+  CRON_SCHEDULE: "* * * * *"
+  CHECK_TIMEOUT: "10000"

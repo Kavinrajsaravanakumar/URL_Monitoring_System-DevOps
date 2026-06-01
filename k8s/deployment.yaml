@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+  labels:
+    app: mongo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  labels:
+    app: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:7
+          ports:
+            - containerPort: 27017
+              name: mongodb
+          volumeMounts:
+            - name: mongo-storage
+              mountPath: /data/db
+      volumes:
+        - name: mongo-storage
+          persistentVolumeClaim:
+            claimName: mongo-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: url-monitor-deployment
+  labels:
+    app: url-monitor-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: url-monitor-app
+  template:
+    metadata:
+      labels:
+        app: url-monitor-app
+    spec:
+      containers:
+        - name: url-monitor-app
+          image: url-monitoring-dashboard:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: url-monitor-config
+                  key: PORT
+            - name: CRON_SCHEDULE
+              valueFrom:
+                configMapKeyRef:
+                  name: url-monitor-config
+                  key: CRON_SCHEDULE
+            - name: CHECK_TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: url-monitor-config
+                  key: CHECK_TIMEOUT
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: url-monitor-secret
+                  key: MONGO_URI
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
