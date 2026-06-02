@@ -56,7 +56,7 @@ const checkWebsite = async (website) => {
     const responseTime = Date.now() - startTime;
 
     // Any network error means the site is OFFLINE
-    website.status = 'OFFLINE';
+    website.status = 'OFFLINE ';
     website.statusCode = null;
     website.responseTime = responseTime;
     website.lastChecked = new Date();
