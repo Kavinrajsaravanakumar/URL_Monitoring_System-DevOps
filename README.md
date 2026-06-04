@@ -165,3 +165,88 @@ URLMS/
 ## 📝 License
 
 MIT
+
+# URL Monitoring System with Cloud & DevOps Integration
+
+## Project Overview
+
+The URL Monitoring System is a web application that continuously monitors website availability and performance. Users can add URLs through a dashboard, and the system periodically checks their status, response time, and uptime information.
+
+## Technologies Used
+
+### Application Layer
+
+* Node.js
+* Express.js
+* MongoDB Atlas
+* HTML/CSS/JavaScript
+
+### DevOps & Cloud
+
+* GitHub (Source Control)
+* Docker (Containerization)
+* Jenkins (CI/CD Automation)
+* Docker Hub (Container Registry)
+* Kubernetes K3s (Container Orchestration)
+* AWS EC2 (Cloud Infrastructure)
+
+## Architecture
+
+GitHub → Jenkins → Docker Build → Docker Hub → Kubernetes (K3s) → MongoDB Atlas
+
+## Implementation
+
+### Phase 1: Application Development
+
+* Developed a URL monitoring dashboard.
+* Implemented periodic URL health checks.
+* Stored monitoring data in MongoDB Atlas.
+
+### Phase 2: Containerization
+
+* Created a Dockerfile for the application.
+* Built and tested Docker images locally.
+* Connected the containerized application to MongoDB Atlas.
+
+### Phase 3: Cloud Deployment
+
+* Provisioned an AWS EC2 instance.
+* Deployed the Dockerized application on EC2.
+* Configured networking and security groups.
+
+### Phase 4: CI/CD Pipeline
+
+* Installed and configured Jenkins.
+* Connected Jenkins with GitHub repository.
+* Configured GitHub Webhooks for automatic build triggering.
+
+### Phase 5: Container Registry Integration
+
+* Pushed Docker images to Docker Hub.
+* Maintained versioned application images for deployment.
+
+### Phase 6: Kubernetes Deployment
+
+* Installed K3s Kubernetes cluster on EC2.
+* Created Kubernetes manifests:
+
+  * Deployment
+  * Service
+  * ConfigMap
+  * Secret
+* Deployed multiple application replicas.
+* Exposed the application through a NodePort service.
+
+## Key Features
+
+* Automated website monitoring.
+* Cloud-hosted MongoDB database.
+* Docker-based deployment.
+* Automated CI/CD pipeline using Jenkins.
+* Kubernetes orchestration with multiple replicas.
+* Cloud deployment on AWS EC2.
+* Scalable and production-oriented architecture.
+
+## Outcome
+
+Successfully implemented a complete Cloud and DevOps workflow where code changes pushed to GitHub trigger Jenkins pipelines, build Docker images, and support deployment through Kubernetes while using MongoDB Atlas as the cloud database.
