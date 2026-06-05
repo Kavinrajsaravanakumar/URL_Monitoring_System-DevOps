@@ -2,53 +2,58 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "url-monitor"
-        CONTAINER_NAME = "url-monitor-app"
+        AWS_DEFAULT_REGION = "us-east-1"
+        // Target S3 bucket for the static frontend hosting (needs to be globally unique)
+        S3_BUCKET_NAME = "url-monitoring-system-frontend-bucket"
+        // Target CloudFront distribution ID for cache invalidations (optional)
+        // CLOUDFRONT_DISTRIBUTION_ID = "E1234567890ABC"
     }
 
     stages {
-
-        stage('Checkout') {
+        stage('Checkout scm') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Install Dependencies') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                echo 'Installing node package dependencies...'
+                sh 'npm install'
             }
         }
 
-        stage('Stop Old Container') {
+        stage('Deploy AWS Infrastructure & Backend') {
             steps {
-                sh '''
-                docker stop $CONTAINER_NAME || true
-                docker rm $CONTAINER_NAME || true
-                '''
+                echo 'Deploying Lambdas, API Gateway, DynamoDB tables, and SNS topics via Serverless...'
+                sh 'npx serverless deploy --stage prod --region $AWS_DEFAULT_REGION'
             }
         }
 
-        stage('Run New Container') {
+        stage('Deploy Frontend to S3') {
             steps {
-                sh '''
-                docker run -d \
-                  --env-file .env \
-                  -p 3000:3000 \
-                  --name $CONTAINER_NAME \
-                  $IMAGE_NAME
-                '''
+                echo 'Syncing static dashboard files to S3 Static Website Hosting...'
+                sh "aws s3 sync public/ s3://${S3_BUCKET_NAME} --delete"
+            }
+        }
+
+        stage('Invalidate CloudFront Cache') {
+            when {
+                expression { env.CLOUDFRONT_DISTRIBUTION_ID != null && env.CLOUDFRONT_DISTRIBUTION_ID != "" }
+            }
+            steps {
+                echo 'Invalidating CloudFront cache for instant update propagation...'
+                sh "aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --paths '/*'"
             }
         }
     }
 
     post {
         success {
-            echo 'Deployment Successful!'
+            echo 'Deployment Completed Successfully!'
         }
-
         failure {
-            echo 'Deployment Failed!'
+            echo 'Deployment Pipeline Failed!'
         }
     }
 }

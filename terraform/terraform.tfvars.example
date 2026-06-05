@@ -1,0 +1,37 @@
+# Terraform Variables Example File
+# Copy this file to terraform.tfvars and update values as needed
+# DO NOT commit terraform.tfvars to version control (add to .gitignore)
+
+# AWS Configuration
+aws_region = "us-east-1"
+environment = "dev"
+
+# EC2 Configuration
+ec2_instance_type = "t3.micro"
+ec2_ssh_key_name = "my-ec2-key"  # Create this in AWS EC2 console first
+ec2_ssh_cidr_blocks = ["0.0.0.0/0"]  # RESTRICT THIS IN PRODUCTION! Use your IP: ["203.0.113.0/32"]
+
+# DynamoDB Configuration (existing tables)
+urls_table_name = "URLs"
+results_table_name = "MonitoringResults"
+
+# SNS Configuration (existing topic)
+sns_topic_name = "url-monitor-alerts"
+sns_topic_arn = "arn:aws:sns:us-east-1:123456789012:url-monitor-alerts"  # Replace with actual ARN
+
+# S3 Configuration
+s3_bucket_prefix = "urlms"
+
+# Monitoring
+enable_monitoring = true
+
+# Additional Tags (optional)
+tags = {
+  Team = "DevOps"
+  Owner = "admin@example.com"
+  CostCenter = "engineering"
+}
+
+# Application Configuration (REQUIRED)
+repo_url     = "https://github.com/kavinrajsaravanakumar/URLMS.git"  # Replace with your repo URL
+docker_image = "kavinrajsaravanakumar/urlms:latest"                   # Replace with your Docker Hub/ECR image
